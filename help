@@ -1,0 +1,18 @@
+_Reset: define tamanho de pilha, seta a pilha do svr mode(atual, via sp), muda cpsr pra irq mode, seta a pilha do irq, volta pro svr mode, jump pra main
+
+main: chama o setup do processoB(C,D,..), e inicializa o timer para gerar as interrupcoes de tempo
+
+setup_linhaX: coloca o r12 em linhax, coloca y em todos os ry de r0-r10, com excecao do r11, em que é posto 12. Coloca na pilha o r11  (valor 12), seta 11 no r11, empilha em massa r11-r0, pega o sp atual (modo svr), aloca um espaço abaixo na pilha e poe o valor do endereço em r3, carrega o valor 14 do lr em r2, coloca o pc como o imprimeX em r1, coloca o cpsr atual em r0, e ativa o bit de irq.
+
+do_irq_interrupt: 
+	- subtrai quatro do lr, devido a adicao que o modo svr faz
+	- salva na pilha do irq os valores, nessa ordem, de lr, r11, r12 (os dois ultimos serao usados logo apos)
+	- vai pro metodo de escolha de qual task é no momento, usando o current_task, salva a pilha da task em r12
+	- desempilha da pilha do irq e coloca na pilha da task primeiramente o r12, depois o r11, depois os de r10-r0
+	- desempilha o lr do irq (será o pc da pilha da task em questao) da pilha do irq, poe em r1
+	- troca para o modo svr (cpsr do svr em r0), de modo a buscar o lr do svr (salvo em r2 ) e o sp do svr (salvo em r3)
+	- troca de volta para o modo irq (cpsr do irq salvo em r0), coloca o spsr_irq no r0, e faz o empilhamento de r3-r0 na pilha da task
+	- verifica se é de fato uma interrupçao de tempo vendo o INTPND
+	- faz a logica de troca de task
+	- chama de novo a funcao de escolha de task
+	- 
