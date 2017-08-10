@@ -12,14 +12,14 @@
 
 _start:
   @ Vetor de interrupcoes
-  B     _Reset                          @posição 0x00 - Reset
-  LDR   pc, _undefined_instruction      @posição 0x04 - Intrução não-definida
-  LDR   pc, _software_interrupt         @posição 0x08 - Interrupção de Software
-  LDR   pc, _prefetch_abort             @posição 0x0C - Prefetch Abort
-  LDR   pc, _data_abort                 @posição 0x10 - Data Abort
-  LDR   pc, _not_used                   @posição 0x14 - Não utilizado
-  LDR   pc, _irq                        @posição 0x18 - Interrupção (IRQ)
-  LDR   pc, _fiq                        @posição 0x1C - Interrupção(FIQ)
+  B     _Reset                          
+  LDR   pc, _undefined_instruction      
+  LDR   pc, _software_interrupt         
+  LDR   pc, _prefetch_abort             
+  LDR   pc, _data_abort                 
+  LDR   pc, _not_used                   
+  LDR   pc, _irq                        
+  LDR   pc, _fiq                        
 
 _undefined_instruction: .word undefined_instruction
 _software_interrupt:    .word software_interrupt
@@ -117,7 +117,6 @@ do_irq_interrupt:       @Rotina de interrupções IRQ
   BL     escolhe_pilha
 
   SUB    r12, r12, #68
-  @LDMFD r12, {r0}
   LDMFD  r12!, {r0-r3}  @ pega os regs sp lr pc cpsr novos
   BIC    r0,r0,#0x80 @reativa a interrupção
 
@@ -133,10 +132,7 @@ do_irq_interrupt:       @Rotina de interrupções IRQ
 
   MSR    spsr_cxsf, r0
 
-  @ADD  r12, r12, #56
   STMFD  sp!, {r1}      @ pc
-  @STMFD sp!, {r2}      @ lr
-  @STMFD sp!, {r3}      @ sp
   BL     c_entry        @vai para o rotina de tratamento da interupção de timer
   LDMFD  r12, {r0-r12}  @retorna registradores ao estado anterior
 
@@ -200,12 +196,12 @@ setup_linhaC:
   LDR   r11, =0x11
   STMFD r12!, {r0-r11}  @ stack r0-r11
   LDR   r3, =stack_top
-  SUB   r3, r3, #0x1000 @sp (r13)
-  LDR   r2, =0x14       @ lr (r14)
-  LDR   r1, =imp_taskC  @pc (r15)
+  SUB   r3, r3, #0x1000 @ sp 
+  LDR   r2, =0x14       @ lr 
+  LDR   r1, =imp_taskC  @ pc
   MRS   r0, cpsr
   BIC   r0,r0,#0x80
-  STMFD r12!, {r0-r3}   @ mock r12-r14. pc é o imp_taskC
+  STMFD r12!, {r0-r3}   
   MOV   pc, lr
 
 main:
