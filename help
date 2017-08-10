@@ -15,4 +15,12 @@ do_irq_interrupt:
 	- verifica se é de fato uma interrupçao de tempo vendo o INTPND
 	- faz a logica de troca de task
 	- chama de novo a funcao de escolha de task
-	- 
+	- volta o r12 de 4*17=68 bytes
+	- pega os regs sp lr pc cpsr novos e reativa a interrupcao no r0 logo apos
+	- muda para o modo svr, colocando o cpsr dele em r4, e recupera em r3 e r2, o sp e o lr , respectivamente, da nova current_task
+	- volta pra irq mode, mantendo cpsr em r4
+	- coloca no spsr o cpsr que foi puxado porem com a interrupçao ativada
+	- arruma o pc na pilha normal, ele estava em r1
+	- jump para tratar a interrupcao de tratamento
+	- retorna regs ao estado anterior
+	- verificar o que faz a ultima instrução (com o ^)
